@@ -6,7 +6,7 @@ use ArraySubscript\{ Annotations\ArraySubscript, Annotations\ArraySubscriptOpera
 
 use Lang\{ Annotations\Computes, ComputedProperties };
 
-use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, ReflectionUnionType;
+use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, ReflectionUnionType, Throwable;
 
 /**
  * Data Transfer Object (DTO).
@@ -14,8 +14,8 @@ use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, Refl
  * @api
  * @abstract
  * @package dto
- * @since 1.0.0
- * @version 1.0.0
+ * @since 0.1.0
+ * @version 1.1.0
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
 abstract class DataTransferObject implements ArrayAccess {
@@ -37,24 +37,48 @@ abstract class DataTransferObject implements ArrayAccess {
      * 
      * @api
      * @since 1.0.0
-     * @version 1.0.0
+     * @version 1.1.0
      * 
      * @param array<int, mixed> $fields
      */
     public function __construct(array $fields) {
 
+        $classReflection = new ReflectionClass(static::class);
+
         if (is_a(static::class, DataTransferCollection::class, true)) {
 
             $this->fields = $fields;
+
+            $signatureMethod    = $classReflection->hasMethod('__v') ? $classReflection->getMethod('__v') : null;
+            $signatureParameter = ($signatureMethod?->getParameters() ?? [])[0] ?? null;
+
+            foreach (Validation\ValidationRule::annotatedOn($signatureParameter, instanceof: true) ?? [] as $validationRule) {
+                
+                foreach ($this->fields as $field => $value) {
+
+                    $validationRule->validate(static::class, $field, $value);
+                }
+            }
+
             return;
         }
 
+        $constructorParameters = $classReflection->getConstructor()->getParameters();
+
         $fieldsNames = array_map(
             fn (ReflectionParameter $parameterReflection) => $parameterReflection->getName(),
-            (new ReflectionClass(static::class))->getConstructor()->getParameters()
+            $constructorParameters
         );
 
         $this->fields = array_combine($fieldsNames, array_pad($fields, count($fieldsNames), null));
+
+        foreach ($constructorParameters as $parameterReflection) {
+
+            foreach (Validation\ValidationRule::annotatedOn($parameterReflection, instanceof: true) ?? [] as $validationRule) {
+
+                $validationRule->validate(static::class, $parameterReflection->getName(), $this->{$parameterReflection->getName()});
+            }
+        }
     }
 
     public final function getFieldsNames(): array {
@@ -158,7 +182,7 @@ abstract class DataTransferObject implements ArrayAccess {
      * @static
      * @internal
      * @since 1.0.0
-     * @version 1.0.0
+     * @version 1.1.0
      * 
      * @param string $field
      * @param mixed $value
@@ -169,7 +193,7 @@ abstract class DataTransferObject implements ArrayAccess {
      * @throws Exceptions\MissingConcreteConstructorException
      * @throws Exceptions\MissingArgumentTypeException
      */
-    protected static function mapField(string $field, mixed $value, ?ReflectionNamedType $type): mixed {
+    protected static function mapField(int|string $field, mixed $value, ?ReflectionNamedType $type): mixed {
 
         if (is_null($type)) {
 
@@ -199,7 +223,36 @@ abstract class DataTransferObject implements ArrayAccess {
 
             if (is_array($value)) {
 
-                $value = $type->getName()::fromArray($value);
+                try {
+
+                    $value = $type->getName()::fromArray($value);
+
+                } catch (Exceptions\ValidationException $validationException) {
+                
+                    throw new Exceptions\ValidationException(
+                        messageTemplate: $validationException->messageTemplate,
+                        dtoClass: static::class,
+                        field: "{$field}.{$validationException->field}",
+                        validationRuleClass: $validationException->validationRuleClass
+                    );
+
+                } catch (Exceptions\InvalidCollectionKeysException $invalidCollectionKeysException) {
+
+                    throw new Exceptions\InvalidCollectionKeysException(
+                        dtoClass: "{$field}.{$invalidCollectionKeysException->dtoClass}"
+                    );
+
+                } catch (Exceptions\MissingArgumentTypeException $missingArgumentTypeException) {
+
+                    throw new Exceptions\MissingArgumentTypeException(
+                        dtoClass: static::class,
+                        field: "{$field}.{$missingArgumentTypeException->field}"
+                    );
+
+                } catch (Throwable $e) {
+
+                    throw $e;
+                }
             }
 
             return $value;

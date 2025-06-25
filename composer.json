@@ -1,6 +1,6 @@
 {
     "name": "ali-eltaweel/dto",
-    "version": "0.1.0",
+    "version": "1.0.0",
     "description": "Data Transfer Object.",
     "maintainers": [
         {
@@ -10,6 +10,7 @@
     ],
     "require": {
         "php": "^8.1",
+        "ext-mbstring": "*",
         "ali-eltaweel/array-subscript": "^1.0.0",
         "ali-eltaweel/computed-properties": "^1.0.1"
     },
