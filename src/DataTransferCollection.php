@@ -11,8 +11,11 @@ namespace DTO;
  * @abstract
  * @package dto
  * @since 0.1.0
- * @version 1.0.0
+ * @version 1.1.0
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
+ * 
+ * @template T
+ * @method T offsetGet(int $offset)
  */
 abstract class DataTransferCollection extends DataTransferObject {
 

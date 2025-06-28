@@ -15,7 +15,7 @@ use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, Refl
  * @abstract
  * @package dto
  * @since 0.1.0
- * @version 1.1.0
+ * @version 1.2.0
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
 abstract class DataTransferObject implements ArrayAccess {
@@ -152,7 +152,7 @@ abstract class DataTransferObject implements ArrayAccess {
      * @version 1.0.0
      * 
      * @param array<int|string, mixed> $fields
-     * @return DataTransferObject
+     * @return static
      * 
      * @throws Exceptions\InvalidCollectionKeysException
      * @throws Exceptions\MissingConcreteConstructorException
