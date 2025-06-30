@@ -15,7 +15,7 @@ use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, Refl
  * @abstract
  * @package dto
  * @since 0.1.0
- * @version 1.4.0
+ * @version 1.5.0
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
 abstract class DataTransferObject implements ArrayAccess {
@@ -90,13 +90,12 @@ abstract class DataTransferObject implements ArrayAccess {
      * Converts this Data Transfer Object to an array.
      * 
      * @api
-     * @final
      * @since 1.0.0
-     * @version 1.0.0
+     * @version 1.1.0
      * 
      * @return array<int|string, mixed> The array representation of this Data Transfer Object.
      */
-    public final function toArray(): array {
+    public function toArray(): array {
 
         /** @var ?callable */
         $toArray = null;
