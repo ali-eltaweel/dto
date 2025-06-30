@@ -15,7 +15,7 @@ use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, Refl
  * @abstract
  * @package dto
  * @since 0.1.0
- * @version 1.3.0
+ * @version 1.4.0
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
 abstract class DataTransferObject implements ArrayAccess {
@@ -148,7 +148,7 @@ abstract class DataTransferObject implements ArrayAccess {
      * @api
      * @static
      * @since 1.0.0
-     * @version 1.1.0
+     * @version 1.2.0
      * 
      * @param array<int|string, mixed> $fields
      * @return static
@@ -165,7 +165,21 @@ abstract class DataTransferObject implements ArrayAccess {
             throw new Exceptions\CannotInstantiateAbstractClassException();
         }
 
-        $fields = static::mapFields($fields);
+        return static::instantiate(fields: static::mapFields($fields));
+    }
+
+    /**
+     * Instantiates a new Data Transfer Object instance.
+     * 
+     * @static
+     * @internal
+     * @since 1.4.0
+     * @version 1.0.0
+     * 
+     * @param array<int|string, mixed> $fields
+     * @return static
+     */
+    protected static final function instantiate(array $fields): static {
 
         if (is_a(static::class, DataTransferCollection::class, true)) {
 
