@@ -15,7 +15,7 @@ use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, Refl
  * @abstract
  * @package dto
  * @since 0.1.0
- * @version 1.2.0
+ * @version 1.3.0
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
 abstract class DataTransferObject implements ArrayAccess {
@@ -146,10 +146,9 @@ abstract class DataTransferObject implements ArrayAccess {
      * Creates a new Data Transfer Object instance from an array.
      * 
      * @api
-     * @final
      * @static
      * @since 1.0.0
-     * @version 1.0.0
+     * @version 1.1.0
      * 
      * @param array<int|string, mixed> $fields
      * @return static
@@ -159,7 +158,7 @@ abstract class DataTransferObject implements ArrayAccess {
      * @throws Exceptions\MissingArgumentTypeException
      * @throws Exceptions\CannotInstantiateAbstractClassException
      */
-    public static final function fromArray(array $fields): static {
+    public static function fromArray(array $fields): static {
 
         if (in_array(static::class, [ self::class, DataTransferCollection::class, DataTransferMap::class ], true)) {
 
