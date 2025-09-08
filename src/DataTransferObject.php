@@ -7,6 +7,7 @@ use ArraySubscript\{ Annotations\ArraySubscript, Annotations\ArraySubscriptOpera
 use Lang\{ Annotations\Computes, ComputedProperties };
 
 use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, ReflectionUnionType, Throwable;
+use ReflectionEnum;
 
 /**
  * Data Transfer Object (DTO).
@@ -15,7 +16,7 @@ use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, Refl
  * @abstract
  * @package dto
  * @since 0.1.0
- * @version 1.5.0
+ * @version 1.6.0
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
 abstract class DataTransferObject implements ArrayAccess {
@@ -91,7 +92,7 @@ abstract class DataTransferObject implements ArrayAccess {
      * 
      * @api
      * @since 1.0.0
-     * @version 1.1.0
+     * @version 1.2.0
      * 
      * @return array<int|string, mixed> The array representation of this Data Transfer Object.
      */
@@ -112,6 +113,21 @@ abstract class DataTransferObject implements ArrayAccess {
 
                     $fields[ $field ] = $toArray($value);
                     continue;
+                }
+
+                if (is_object($value)) {
+
+                    if (method_exists($value, 'toArray')) {
+
+                        $fields[ $field ] = $value->toArray();
+                        continue;
+                    }
+
+                    if (enum_exists($value::class)) {
+
+                        $fields[ $field ] = property_exists($value, 'value') ? $value->value : $value->name;
+                        continue;
+                    }
                 }
 
                 $fields[ $field ] = $value;
@@ -194,7 +210,7 @@ abstract class DataTransferObject implements ArrayAccess {
      * @static
      * @internal
      * @since 1.0.0
-     * @version 1.1.0
+     * @version 1.2.0
      * 
      * @param string $field
      * @param mixed $value
@@ -269,6 +285,28 @@ abstract class DataTransferObject implements ArrayAccess {
 
             return $value;
         }
+
+        if (class_exists($typeName = $type->getName())) {
+
+            if ($value instanceof $typeName) {
+
+                return $value;
+            }
+
+            if (enum_exists($typeName = $type->getName())) {
+    
+                if (method_exists($typeName, 'tryFrom') && !is_null($enumCase = $typeName::tryFrom($value))) {
+    
+                    return $enumCase;
+                }
+                
+                if (is_string($value) && defined("$typeName::$value")) {
+    
+                    return constant("$typeName::$value");
+                }
+            }
+        }
+
 
         throw new Exceptions\UnsupportedArgumentTypeException(static::class, $field, $type->getName());
     }
