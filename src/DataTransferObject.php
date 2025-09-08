@@ -379,6 +379,7 @@ abstract class DataTransferObject implements ArrayAccess {
             if (is_null($parameterType = $parameterReflection->getType())) {
 
                 $mappedFields[ $parameterName ] = $fields[ $parameterName ] ?? null;
+                continue;
             }
 
             if ($parameterType instanceof ReflectionUnionType) {
