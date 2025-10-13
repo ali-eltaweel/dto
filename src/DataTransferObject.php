@@ -16,7 +16,7 @@ use ReflectionEnum;
  * @abstract
  * @package dto
  * @since 0.1.0
- * @version 1.6.0
+ * @version 1.6.1
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
 abstract class DataTransferObject implements ArrayAccess {
@@ -38,7 +38,7 @@ abstract class DataTransferObject implements ArrayAccess {
      * 
      * @api
      * @since 1.0.0
-     * @version 1.1.0
+     * @version 1.1.1
      * 
      * @param array<int, mixed> $fields
      */
@@ -50,8 +50,12 @@ abstract class DataTransferObject implements ArrayAccess {
 
             $this->fields = $fields;
 
-            $signatureMethod    = $classReflection->hasMethod('__v') ? $classReflection->getMethod('__v') : null;
-            $signatureParameter = ($signatureMethod?->getParameters() ?? [])[0] ?? null;
+            $signatureMethod = $classReflection->hasMethod('__v') ? $classReflection->getMethod('__v') : null;
+            
+            if (is_null($signatureParameter = ($signatureMethod?->getParameters() ?? [])[0] ?? null)) {
+
+                return;
+            }
 
             foreach (Validation\ValidationRule::annotatedOn($signatureParameter, instanceof: true) ?? [] as $validationRule) {
                 
