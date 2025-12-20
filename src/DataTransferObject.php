@@ -7,7 +7,6 @@ use ArraySubscript\{ Annotations\ArraySubscript, Annotations\ArraySubscriptOpera
 use Lang\{ Annotations\Computes, ComputedProperties };
 
 use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, ReflectionUnionType, Throwable;
-use ReflectionEnum;
 
 /**
  * Data Transfer Object (DTO).
@@ -311,6 +310,10 @@ abstract class DataTransferObject implements ArrayAccess {
             }
         }
 
+        if ($type->getName() === 'mixed') {
+
+            return $value;
+        }
 
         throw new Exceptions\UnsupportedArgumentTypeException(static::class, $field, $type->getName());
     }
