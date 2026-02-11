@@ -15,7 +15,7 @@ use ArrayAccess, ReflectionClass, ReflectionNamedType, ReflectionParameter, Refl
  * @abstract
  * @package dto
  * @since 0.1.0
- * @version 1.6.1
+ * @version 1.6.2
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
 abstract class DataTransferObject implements ArrayAccess {
@@ -95,7 +95,7 @@ abstract class DataTransferObject implements ArrayAccess {
      * 
      * @api
      * @since 1.0.0
-     * @version 1.2.0
+     * @version 1.2.1
      * 
      * @return array<int|string, mixed> The array representation of this Data Transfer Object.
      */
@@ -107,7 +107,7 @@ abstract class DataTransferObject implements ArrayAccess {
 
             foreach ($fields as $field => $value) {
 
-                if (is_a($value, DataTransferObject::class, true)) {
+                if (is_object($value) && is_a($value, DataTransferObject::class, true)) {
                     $fields[ $field ] = $value->toArray();
                     continue;
                 }
