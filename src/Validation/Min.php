@@ -11,7 +11,7 @@ use Attribute;
  * @final
  * @package dto
  * @since 1.0.0
- * @version 1.0.1
+ * @version 1.1.0
  * @author Ali M. Kamel <ali.kamel.dev@gmail.com>
  */
 #[Attribute(Attribute::TARGET_PARAMETER)]
@@ -36,7 +36,7 @@ final class Min extends ValidationRule {
      * @internal
      * @override
      * @since 1.0.0
-     * @version 1.0.1
+     * @version 1.1.0
      * 
      * @param mixed $input
      * @return ?string The error message if validation fails, null otherwise.
@@ -48,7 +48,7 @@ final class Min extends ValidationRule {
             return $input >= $this->value ? null : "Value of {dtoClass}.{field} must be at least {$this->value}.";
         }
 
-        if (is_array($input)) {
+        if (is_countable($input)) {
 
             return count($input) >= $this->value ? null : "Value of {dtoClass}.{field} must be an array with at least {$this->value} element(s).";
         }
